@@ -1,0 +1,1 @@
+build --copt=-O3 --copt=-march=native --copt=-std=c++17
