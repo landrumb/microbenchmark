@@ -7,20 +7,9 @@
 
 #include <atomic>
 
-
-static void BM_Accumulator128(benchmark::State& state) {
-  threadlocal::accumulator<int, 128, 192> acc;
-
-  for (auto _ : state) {
-    parlay::parallel_for(0, 1000000, [&] (size_t i) {
-    acc.add(i % 100);
-  });
-  }
-}
-BENCHMARK(BM_Accumulator128);
-
-static void BM_Accumulator64(benchmark::State& state) {
-  threadlocal::accumulator<int, 64, 192> acc;
+template <size_t pad_bytes>
+static void BM_Accumulator(benchmark::State& state) {
+  threadlocal::accumulator<int, pad_bytes, 192> acc;
 
   for (auto _ : state) {
     parlay::parallel_for(0, 1000000, [&] (size_t i) {
@@ -28,29 +17,16 @@ static void BM_Accumulator64(benchmark::State& state) {
   });
   }
 }
-BENCHMARK(BM_Accumulator64);
+BENCHMARK(BM_Accumulator<4>);
+BENCHMARK(BM_Accumulator<8>);
+BENCHMARK(BM_Accumulator<16>);
+BENCHMARK(BM_Accumulator<32>);
+BENCHMARK(BM_Accumulator<64>);
+BENCHMARK(BM_Accumulator<128>);
+BENCHMARK(BM_Accumulator<256>);
+BENCHMARK(BM_Accumulator<512>);
+BENCHMARK(BM_Accumulator<1024>);
 
-static void BM_Accumulator32(benchmark::State& state) {
-  threadlocal::accumulator<int, 32, 192> acc;
-
-    for (auto _ : state) {
-        parlay::parallel_for(0, 1000000, [&] (size_t i) {
-        acc.add(i % 100);
-    });
-    }
-}
-BENCHMARK(BM_Accumulator32);
-
-static void BM_Accumulator16(benchmark::State& state) {
-  threadlocal::accumulator<int, 16, 192> acc;
-
-    for (auto _ : state) {
-        parlay::parallel_for(0, 1000000, [&] (size_t i) {
-        acc.add(i % 100);
-    });
-    }
-}
-BENCHMARK(BM_Accumulator16);
 
 static void BM_SeqSum(benchmark::State& state) {
     int sum = 0;
