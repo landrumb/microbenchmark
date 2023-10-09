@@ -7,13 +7,15 @@
 
 #include <atomic>
 
+int numbers[1000000];
+
 template <size_t pad_bytes>
 static void BM_Accumulator(benchmark::State& state) {
   threadlocal::accumulator<int, pad_bytes, 192> acc;
 
   for (auto _ : state) {
     parlay::parallel_for(0, 1000000, [&] (size_t i) {
-    acc.add(i % 100);
+    acc.add(numbers[i]);
   });
   }
 }
@@ -32,7 +34,7 @@ static void BM_SeqSum(benchmark::State& state) {
     int sum = 0;
   for (auto _ : state) {
     for (int i = 0; i < 1000000; i++) {
-        sum += i % 100;
+        sum += numbers[i];
     }
   }
   if (sum == 0) {
@@ -45,10 +47,17 @@ static void BM_AtomicSum(benchmark::State& state) {
     std::atomic<int> sum = 0;
   for (auto _ : state) {
     parlay::parallel_for(0, 1000000, [&] (size_t i) {
-    sum += i % 100;
+    sum += numbers[i];
   });
   }
 }
 BENCHMARK(BM_AtomicSum);
 
-BENCHMARK_MAIN();
+int main(int argc, char** argv) {
+    parlay::random r;
+    for (int i = 0; i < 1000000; i++) {
+        numbers[i] = r.ith_rand(i) % 100;
+    }
+    benchmark::Initialize(&argc, argv);
+    benchmark::RunSpecifiedBenchmarks();
+}
