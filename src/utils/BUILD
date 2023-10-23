@@ -1,6 +1,6 @@
 # ANNS utilility.
 
-package(default_visibility = ["//algorithms:__subpackages__"])
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "types",
@@ -72,4 +72,15 @@ cc_library(
 cc_library(
     name = "csvfile",
     hdrs = ["csvfile.h"],
+)
+
+cc_library(
+    name = "point_range",
+    hdrs = ["point_range.h"],
+    deps = [
+        "@parlaylib//parlay:parallel",
+        "@parlaylib//parlay:primitives",
+        ":indexTools",
+        ":types",
+    ],
 )

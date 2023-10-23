@@ -1,20 +1,3 @@
-# cc_library(
-#     name = "parlay",
-#     hdrs = ["parlay/sequence.h",
-#             "parlay/parallel.h",
-#             "parlay/primitives.h",
-#             "parlay/random.h",
-#             "parlay/monoid.h",
-#             "parlay/io.h",
-#             "parlay/alloc.h",
-#             "parlay/internal/get_time.h",
-#             "parlay/slice.h",
-#             "parlay/delayed_sequence.h"],
-#     alwayslink = False,
-#     includes = ["parlaylib/include"],
-#     include_prefix = "parlaylib/include",
-# )
-
 cc_binary(
     name = "bench",
     srcs = ["bench.cpp", "threadlocal.h"],
@@ -23,5 +6,6 @@ cc_binary(
             "@parlaylib//parlay:parallel",
             "@parlaylib//parlay:primitives",
             "@parlaylib//parlay:random",
-            "@parlaylib//parlay:monoid",],
+            "@parlaylib//parlay:monoid",
+            "//src/utils:NSGDist"],
 )
