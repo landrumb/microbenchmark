@@ -236,13 +236,11 @@ int main(int argc, char** argv) {
     numbers = parlay::sequence<int>::uninitialized(N);
     // parlay::random r;
     // fill numbers with normally distributed random numbers
-    auto rand = [] (size_t i) {
-        std::mt19937 gen(i);
-        std::normal_distribution<int> dist(0, 1);
-        return dist(gen);
-    };
-    parlay::parallel_for(0, N, [&] (size_t i) {
-        numbers[i] = rand(i) % 10'000'000'000;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    
+    parlay::parallel_for(0, N, [&] (int i) {
+        numbers[i] = static_cast<int>(gen()) % 10'000'000;
     });
 
     benchmark::Initialize(&argc, argv);
