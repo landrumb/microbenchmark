@@ -14,7 +14,7 @@
 
 constexpr size_t N = 1000000000;
 
-parlay::sequence<float> numbers;
+parlay::sequence<int> numbers;
 
 const int N_THREADS = 192;
 
@@ -90,21 +90,22 @@ static void BM_AtomicSum(benchmark::State& state) {
 }
 // BENCHMARK(BM_AtomicSum);
 
-static void BM_FloatNSGDist(benchmark::State& state) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  efanna2e::DistanceL2 distfunc;
-  volatile size_t dim = 192;
-  for (auto _ : state) {
-    float *p = numbers.begin() + (gen() % (N - 192));
-    float *q = numbers.begin() + (gen() % (N - 192));
-    float x = distfunc.compare(p, q, dim);
-    if (x == 12345678) {
-        std::cout << "x is zero" << std::endl;
-    }
-  }
-}
-BENCHMARK(BM_FloatNSGDist)->MinWarmUpTime(3)->MinTime(3);
+
+// static void BM_FloatNSGDist(benchmark::State& state) {
+//   std::random_device rd;
+//   std::mt19937 gen(rd());
+//   efanna2e::DistanceL2 distfunc;
+//   volatile size_t dim = 192;
+//   for (auto _ : state) {
+//     float *p = numbers.begin() + (gen() % (N - 192));
+//     float *q = numbers.begin() + (gen() % (N - 192));
+//     float x = distfunc.compare(p, q, dim);
+//     if (x == 12345678) {
+//         std::cout << "x is zero" << std::endl;
+//     }
+//   }
+// }
+// BENCHMARK(BM_FloatNSGDist)->MinWarmUpTime(3)->MinTime(3);
 
 float distance(const float *p, const float *q, size_t dim) {
     float sum = 0;
@@ -142,80 +143,106 @@ float distance_sqrt192(const float *p, const float *q) {
     return std::sqrt(sum);
 }
 
-static void BM_FloatVarLoop(benchmark::State& state) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
+// static void BM_FloatVarLoop(benchmark::State& state) {
+//   std::random_device rd;
+//   std::mt19937 gen(rd());
   
-  volatile size_t dim = 192;
-  for (auto _ : state) {
-    float *p = numbers.begin() + (gen() % (N - 192));
-    float *q = numbers.begin() + (gen() % (N - 192));
-    float x = distance(p, q, dim);
-    if (x == 12345678) {
-        std::cout << "x is zero" << std::endl;
-    }
-  }
-}
-BENCHMARK(BM_FloatVarLoop)->MinWarmUpTime(3)->MinTime(3);
+//   volatile size_t dim = 192;
+//   for (auto _ : state) {
+//     float *p = numbers.begin() + (gen() % (N - 192));
+//     float *q = numbers.begin() + (gen() % (N - 192));
+//     float x = distance(p, q, dim);
+//     if (x == 12345678) {
+//         std::cout << "x is zero" << std::endl;
+//     }
+//   }
+// }
+// BENCHMARK(BM_FloatVarLoop)->MinWarmUpTime(3)->MinTime(3);
 
-static void BM_FloatSqrtVarLoop(benchmark::State& state) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
+// static void BM_FloatSqrtVarLoop(benchmark::State& state) {
+//   std::random_device rd;
+//   std::mt19937 gen(rd());
   
-  volatile size_t dim = 192;
-  for (auto _ : state) {
-    float *p = numbers.begin() + (gen() % (N - 192));
-    float *q = numbers.begin() + (gen() % (N - 192));
-    float x = distance_sqrt(p, q, dim);
-    if (x == 12345678) {
-        std::cout << "x is zero" << std::endl;
-    }
-  }
-}
-BENCHMARK(BM_FloatSqrtVarLoop)->MinWarmUpTime(3)->MinTime(3);
+//   volatile size_t dim = 192;
+//   for (auto _ : state) {
+//     float *p = numbers.begin() + (gen() % (N - 192));
+//     float *q = numbers.begin() + (gen() % (N - 192));
+//     float x = distance_sqrt(p, q, dim);
+//     if (x == 12345678) {
+//         std::cout << "x is zero" << std::endl;
+//     }
+//   }
+// }
+// BENCHMARK(BM_FloatSqrtVarLoop)->MinWarmUpTime(3)->MinTime(3);
 
-static void BM_FloatSqrtConstLoop(benchmark::State& state) {
+// static void BM_FloatSqrtConstLoop(benchmark::State& state) {
+//   std::random_device rd;
+//   std::mt19937 gen(rd());
+
+//   for (auto _ : state) {
+//     float *p = numbers.begin() + (gen() % (N - 192));
+//     float *q = numbers.begin() + (gen() % (N - 192));
+//     float x = distance_sqrt192(p, q);
+//     if (x == 12345678) {
+//         std::cout << "x is zero" << std::endl;
+//     }
+//   }
+// }
+// BENCHMARK(BM_FloatSqrtConstLoop)->MinWarmUpTime(3)->MinTime(3);
+
+static void BM_JoinSortedArrays(benchmark::State& state) {
   std::random_device rd;
   std::mt19937 gen(rd());
+  size_t n = 20000;
+  parlay::sequence<int> a = parlay::sequence<int>::uninitialized(n);
+  parlay::sequence<int> b = parlay::sequence<int>::uninitialized(n);
+  
 
   for (auto _ : state) {
-    float *p = numbers.begin() + (gen() % (N - 192));
-    float *q = numbers.begin() + (gen() % (N - 192));
-    float x = distance_sqrt192(p, q);
-    if (x == 12345678) {
-        std::cout << "x is zero" << std::endl;
+    int *p = numbers.begin() + (gen() % (N - 20'000));
+    int *q = numbers.begin() + (gen() % (N - 20'000));
+    for (size_t i=0; i<n; i++) {
+        a[i] = p[i];
+        b[i] = q[i];
     }
+    std::cout<<a[0]<<std::endl;
+
+    parlay::sort_inplace(a);
+    parlay::sort_inplace(b);
+
+    
+
   }
 }
-BENCHMARK(BM_FloatSqrtConstLoop)->MinWarmUpTime(3)->MinTime(3);
+BENCHMARK(BM_JoinSortedArrays)->MinWarmUpTime(3)->MinTime(3);
 
-static void BM_FloatConstLoop(benchmark::State& state) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
+// static void BM_FloatConstLoop(benchmark::State& state) {
+//   std::random_device rd;
+//   std::mt19937 gen(rd());
 
-  for (auto _ : state) {
-    float *p = numbers.begin() + (gen() % (N - 192));
-    float *q = numbers.begin() + (gen() % (N - 192));
-    float x = distance192(p, q);
-    if (x == 12345678) {
-        std::cout << "x is zero" << std::endl;
-    }
-  }
-}
-BENCHMARK(BM_FloatConstLoop)->MinWarmUpTime(3)->MinTime(3);
+//   for (auto _ : state) {
+//     float *p = numbers.begin() + (gen() % (N - 192));
+//     float *q = numbers.begin() + (gen() % (N - 192));
+//     float x = distance192(p, q);
+//     if (x == 12345678) {
+//         std::cout << "x is zero" << std::endl;
+//     }
+//   }
+// }
+// BENCHMARK(BM_FloatConstLoop)->MinWarmUpTime(3)->MinTime(3);
 
 
 int main(int argc, char** argv) {
-    numbers = parlay::sequence<float>::uninitialized(N);
+    numbers = parlay::sequence<int>::uninitialized(N);
     // parlay::random r;
     // fill numbers with normally distributed random numbers
     auto rand = [] (size_t i) {
         std::mt19937 gen(i);
-        std::normal_distribution<float> dist(0, 1);
+        std::normal_distribution<int> dist(0, 1);
         return dist(gen);
     };
     parlay::parallel_for(0, N, [&] (size_t i) {
-        numbers[i] = rand(i);
+        numbers[i] = rand(i) % 10'000'000'000;
     });
 
     benchmark::Initialize(&argc, argv);
