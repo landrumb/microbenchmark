@@ -205,7 +205,7 @@ static void BM_JoinSortedArrays(benchmark::State& state) {
         a[i] = p[i];
         b[i] = q[i];
     }
-    std::cout<<a[0]<<std::endl;
+    // std::cout<<a[0]<<std::endl;
 
     parlay::sort_inplace(a);
     parlay::sort_inplace(b);
