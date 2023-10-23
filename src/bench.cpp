@@ -4,6 +4,7 @@
 #include "parlay/primitives.h"
 #include "parlay/sequence.h"
 #include "parlay/random.h"
+#include "utils/NSGDist.h"
 
 #include <atomic>
 
@@ -84,6 +85,10 @@ static void BM_AtomicSum(benchmark::State& state) {
   }
 }
 // BENCHMARK(BM_AtomicSum);
+
+static void BM_FloatNSGDist(benchmark::State& state) {
+  
+}
 
 int main(int argc, char** argv) {
     numbers = parlay::sequence<int>::uninitialized(1000000000);
