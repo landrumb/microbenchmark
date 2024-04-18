@@ -84,3 +84,12 @@ cc_library(
         ":types",
     ],
 )
+
+cc_library(
+    name = "avx_dist",
+    deps = [ ],
+    srcs = [],
+    data = [],
+    hdrs = ["avx_dist.h"],
+    alwayslink = False
+)

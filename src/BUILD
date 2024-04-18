@@ -7,5 +7,6 @@ cc_binary(
             "@parlaylib//parlay:primitives",
             "@parlaylib//parlay:random",
             "@parlaylib//parlay:monoid",
-            "//src/utils:NSGDist"],
+            "//src/utils:NSGDist",
+            "//src/utils:avx_dist"],
 )
