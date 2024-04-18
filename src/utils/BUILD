@@ -1,4 +1,4 @@
-# ANNS utilility.
+# ANNS utility.
 
 package(default_visibility = ["//visibility:public"])
 
