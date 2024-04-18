@@ -218,6 +218,53 @@ static void BM_FloatAVX512(benchmark::State& state) {
 }
 BENCHMARK(BM_FloatAVX512)->MinWarmUpTime(3)->MinTime(3);
 
+static void BM_FloatAVX512_unaligned(benchmark::State& state) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  
+  for (auto _ : state) {
+    float *p = select_point(gen);
+    float *q = select_point(gen);
+    float x = sq_euclidean_unaligned_100(p, q);
+    if (x == 12345678) {
+        std::cout << "x is zero" << std::endl;
+    }
+  }
+}
+BENCHMARK(BM_FloatAVX512_unaligned)->MinTime(3);
+
+static void BM_FloatAVX512_dim_arg(benchmark::State& state) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  
+  volatile size_t dim = DIM;
+  for (auto _ : state) {
+    float *p = select_point(gen);
+    float *q = select_point(gen);
+    float x = sq_euclidean(p, q, dim);
+    if (x == 12345678) {
+        std::cout << "x is zero" << std::endl;
+    }
+  }
+}
+BENCHMARK(BM_FloatAVX512_dim_arg)->MinWarmUpTime(3)->MinTime(3);
+
+static void BM_FloatAVX512_dim_arg_no_volatile(benchmark::State& state) {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  
+  // volatile size_t dim = DIM;
+  for (auto _ : state) {
+    float *p = select_point(gen);
+    float *q = select_point(gen);
+    float x = sq_euclidean(p, q, DIM);
+    if (x == 12345678) {
+        std::cout << "x is zero" << std::endl;
+    }
+  }
+}
+BENCHMARK(BM_FloatAVX512_dim_arg_no_volatile)->MinWarmUpTime(3)->MinTime(3);
+
 static void BM_FloatAVX512Pipeline2(benchmark::State& state) {
   std::random_device rd;
   std::mt19937 gen(rd());
